@@ -1,0 +1,1742 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brightspace Redesign Prototype</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --page: #f8fbff;
+      --panel: rgba(255, 255, 255, .88);
+      --panel-solid: #ffffff;
+      --text: #111318;
+      --soft-text: #596174;
+      --muted: #8b93a3;
+      --line: #edf1f8;
+      --blue: #1463ff;
+      --blue-soft: #eaf2ff;
+      --pink: #ff3d75;
+      --pink-soft: #ffe6ef;
+      --orange: #ff6b1a;
+      --orange-soft: #fff1dd;
+      --green: #1db976;
+      --green-soft: #ddf8ed;
+      --purple: #8f4ff8;
+      --purple-soft: #f0e5ff;
+      --shadow: 0 18px 48px rgba(55, 71, 98, .10);
+      --shadow-soft: 0 10px 30px rgba(55, 71, 98, .08);
+      --radius: 18px;
+      --sidebar: 280px;
+      --right: 340px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background:
+        radial-gradient(circle at 36% 18%, rgba(20, 99, 255, .12), transparent 0 24%, transparent 25%),
+        radial-gradient(circle at 92% 88%, rgba(143, 79, 248, .16), transparent 0 20%, transparent 21%),
+        var(--page);
+      color: var(--text);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .skip-link {
+      position: fixed;
+      left: 16px;
+      top: 16px;
+      z-index: 30;
+      padding: 10px 14px;
+      background: var(--text);
+      color: #fff;
+      border-radius: 10px;
+      transform: translateY(-160%);
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .app-frame {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: var(--sidebar) minmax(0, 1fr);
+      border-radius: 0;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 30px 24px;
+      background: rgba(255, 255, 255, .76);
+      border-right: 1px solid rgba(225, 232, 243, .74);
+      box-shadow: 16px 0 40px rgba(64, 77, 110, .04);
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 28px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .spark {
+      position: relative;
+      width: 34px;
+      height: 34px;
+      flex: 0 0 auto;
+    }
+
+    .spark span {
+      position: absolute;
+      left: 14px;
+      top: 2px;
+      width: 6px;
+      height: 14px;
+      border-radius: 999px;
+      background: var(--orange);
+      transform-origin: 3px 15px;
+    }
+
+    .spark span:nth-child(2) { transform: rotate(45deg); }
+    .spark span:nth-child(3) { transform: rotate(90deg); }
+    .spark span:nth-child(4) { transform: rotate(135deg); }
+    .spark span:nth-child(5) { transform: rotate(180deg); }
+    .spark span:nth-child(6) { transform: rotate(225deg); }
+    .spark span:nth-child(7) { transform: rotate(270deg); }
+    .spark span:nth-child(8) { transform: rotate(315deg); }
+
+    .wordmark strong {
+      display: block;
+      font-size: 24px;
+      letter-spacing: -.03em;
+      line-height: 1;
+    }
+
+    .wordmark span {
+      display: block;
+      margin-top: 6px;
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .nav {
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+
+    .nav-button {
+      min-height: 66px;
+      border: 0;
+      border-radius: 16px;
+      background: transparent;
+      color: var(--text);
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 16px;
+      padding: 0 22px;
+      text-align: left;
+      font-size: 16px;
+      font-weight: 650;
+    }
+
+    .nav-button:hover,
+    .nav-button[aria-current="page"] {
+      background: linear-gradient(135deg, #edf4ff, #f7fbff);
+      color: var(--blue);
+      box-shadow: inset 0 0 0 1px rgba(20, 99, 255, .03);
+    }
+
+    .nav-icon {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      color: currentColor;
+    }
+
+    .nav-icon svg,
+    .ui-icon svg {
+      width: 24px;
+      height: 24px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .mini-badge {
+      min-width: 22px;
+      height: 22px;
+      padding: 0 7px;
+      border-radius: 999px;
+      background: #ecf3ff;
+      color: var(--blue);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .side-bottom {
+      border-radius: 18px;
+      background: rgba(255, 255, 255, .82);
+      border: 1px solid var(--line);
+      padding: 12px;
+      box-shadow: var(--shadow-soft);
+      display: grid;
+      gap: 8px;
+    }
+
+    .side-setting {
+      min-height: 46px;
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 10px;
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .switch {
+      width: 44px;
+      height: 25px;
+      border-radius: 999px;
+      background: #e1e6ef;
+      padding: 3px;
+      border: 0;
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    .switch span {
+      width: 19px;
+      height: 19px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 2px 7px rgba(28, 35, 48, .18);
+    }
+
+    .dark .switch {
+      justify-content: flex-end;
+      background: var(--blue);
+    }
+
+    .main-shell {
+      min-width: 0;
+      padding: 28px 26px 34px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 22px;
+      align-items: start;
+      margin-bottom: 22px;
+    }
+
+    .greeting h1 {
+      margin: 14px 0 8px;
+      font-size: clamp(30px, 3.1vw, 42px);
+      line-height: 1.05;
+      letter-spacing: -.05em;
+    }
+
+    .greeting p {
+      margin: 0;
+      color: var(--soft-text);
+      font-size: 17px;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .round-action {
+      position: relative;
+      width: 42px;
+      height: 42px;
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      display: grid;
+      place-items: center;
+    }
+
+    .round-action .count {
+      position: absolute;
+      right: -1px;
+      top: -3px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #ff321f;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      display: grid;
+      place-items: center;
+      border: 2px solid #fff;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 0;
+      background: transparent;
+      font-weight: 760;
+      color: var(--text);
+    }
+
+    .avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background: linear-gradient(135deg, #d9e8ff, #edf4ff);
+      box-shadow: inset 0 0 0 1px rgba(20, 99, 255, .09);
+    }
+
+    .face {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 35% 42%, #24140f 0 2px, transparent 3px),
+        radial-gradient(circle at 65% 42%, #24140f 0 2px, transparent 3px),
+        radial-gradient(circle at 50% 62%, #b45e52 0 5px, transparent 6px),
+        radial-gradient(circle at 50% 8%, #3b2119 0 17px, transparent 18px),
+        #c88c70;
+      border: 4px solid #4a2a20;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) var(--right);
+      gap: 26px;
+      align-items: start;
+    }
+
+    .content {
+      min-width: 0;
+    }
+
+    .right-rail {
+      display: grid;
+      gap: 20px;
+    }
+
+    .searchbar {
+      position: relative;
+      max-width: 860px;
+      margin: 0 0 30px;
+    }
+
+    .searchbar input {
+      width: 100%;
+      height: 58px;
+      border: 1px solid #e5ebf4;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .86);
+      box-shadow: var(--shadow-soft);
+      padding: 0 76px 0 58px;
+      color: var(--text);
+      outline: none;
+      font-size: 16px;
+    }
+
+    .searchbar input:focus {
+      border-color: rgba(20, 99, 255, .55);
+      box-shadow: 0 0 0 4px rgba(20, 99, 255, .12), var(--shadow-soft);
+    }
+
+    .searchbar .left {
+      position: absolute;
+      left: 22px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6b7484;
+    }
+
+    .shortcut {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 34px;
+      min-width: 54px;
+      border-radius: 11px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--soft-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 760;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 0 0 18px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 25px;
+      line-height: 1.1;
+      letter-spacing: -.04em;
+    }
+
+    .section-title span {
+      color: var(--soft-text);
+      font-size: 15px;
+    }
+
+    .link-button,
+    .plain-button {
+      min-height: 38px;
+      border: 0;
+      background: transparent;
+      color: var(--blue);
+      font-weight: 760;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 0 4px;
+    }
+
+    .plain-button {
+      color: var(--text);
+      padding: 0 10px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, .78);
+      box-shadow: 0 4px 14px rgba(54, 66, 93, .06);
+    }
+
+    .cards-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+      margin-bottom: 36px;
+    }
+
+    .priority-card,
+    .course-card,
+    .panel,
+    .continue-card {
+      background: var(--panel);
+      border: 1px solid rgba(232, 237, 246, .82);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .priority-card {
+      min-height: 194px;
+      padding: 24px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 18px;
+    }
+
+    .priority-top {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .bubble {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--pink);
+      background: var(--pink-soft);
+      flex: 0 0 auto;
+    }
+
+    .bubble.orange {
+      background: var(--orange-soft);
+      color: #ec6a00;
+    }
+
+    .bubble.green {
+      background: var(--green-soft);
+      color: #0ca56a;
+    }
+
+    .priority-card h3 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -.02em;
+    }
+
+    .priority-card p {
+      margin: 7px 0 0;
+      color: var(--soft-text);
+      font-size: 15px;
+    }
+
+    .priority-main strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 17px;
+    }
+
+    .priority-main span {
+      color: var(--soft-text);
+      font-size: 15px;
+    }
+
+    .priority-foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+    }
+
+    .date-red {
+      color: #ff1f45;
+      font-weight: 780;
+    }
+
+    .date-orange {
+      color: #f26b00;
+      font-weight: 780;
+    }
+
+    .date-green {
+      color: #12a86a;
+      font-weight: 780;
+    }
+
+    .course-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 22px;
+      margin-bottom: 36px;
+    }
+
+    .course-card {
+      overflow: hidden;
+      min-height: 250px;
+    }
+
+    .course-art {
+      position: relative;
+      height: 124px;
+      overflow: hidden;
+      background: var(--art);
+    }
+
+    .course-art:after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(15, 22, 35, .28), transparent 54%);
+    }
+
+    .heart {
+      position: absolute;
+      z-index: 1;
+      right: 18px;
+      top: 18px;
+      width: 28px;
+      height: 28px;
+      color: #fff;
+      display: grid;
+      place-items: center;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .22));
+    }
+
+    .heart svg {
+      width: 28px;
+      height: 28px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .course-info {
+      padding: 17px 20px 18px;
+    }
+
+    .course-info h3 {
+      margin: 0 0 7px;
+      font-size: 18px;
+      letter-spacing: -.02em;
+    }
+
+    .course-info p {
+      margin: 0 0 18px;
+      color: var(--soft-text);
+      font-size: 14px;
+    }
+
+    .progress-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      align-items: center;
+      gap: 12px;
+      color: var(--soft-text);
+      font-size: 14px;
+    }
+
+    .bar {
+      height: 8px;
+      border-radius: 999px;
+      background: #e5ecfa;
+      overflow: hidden;
+    }
+
+    .bar span {
+      display: block;
+      height: 100%;
+      width: var(--value);
+      border-radius: inherit;
+      background: var(--blue);
+    }
+
+    .bookmark {
+      width: 18px;
+      height: 22px;
+      border: 2px solid #9aa5b6;
+      border-bottom-left-radius: 3px;
+      border-bottom-right-radius: 3px;
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 77%, 0 100%);
+    }
+
+    .continue-card {
+      min-height: 120px;
+      padding: 16px 22px 16px 18px;
+      display: grid;
+      grid-template-columns: 148px minmax(0, 1fr) auto auto;
+      gap: 20px;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+
+    .thumb {
+      position: relative;
+      height: 92px;
+      border-radius: 12px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 22% 82%, rgba(9, 39, 58, .9), transparent 0 22%, transparent 23%),
+        linear-gradient(150deg, #6bb9d3, #163b5d 60%, #081b2d);
+    }
+
+    .play {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .82);
+      display: grid;
+      place-items: center;
+      color: #0d2d45;
+      font-weight: 900;
+    }
+
+    .continue-copy p {
+      margin: 0 0 5px;
+      color: var(--soft-text);
+      font-size: 14px;
+    }
+
+    .continue-copy h3 {
+      margin: 0 0 18px;
+      font-size: 16px;
+    }
+
+    .continue-progress {
+      display: grid;
+      grid-template-columns: minmax(160px, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      color: var(--soft-text);
+      font-size: 14px;
+    }
+
+    .primary {
+      min-height: 48px;
+      border: 0;
+      border-radius: 12px;
+      padding: 0 24px;
+      background: #eef4ff;
+      color: var(--blue);
+      font-weight: 800;
+    }
+
+    .kebab {
+      width: 42px;
+      height: 42px;
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .caught-up {
+      text-align: center;
+      color: #98a1b2;
+      font-size: 15px;
+      margin: 10px 0 0;
+    }
+
+    .panel {
+      padding: 24px;
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .panel h2,
+    .panel h3 {
+      margin: 0;
+      letter-spacing: -.02em;
+    }
+
+    .schedule {
+      display: grid;
+      gap: 22px;
+    }
+
+    .schedule-row {
+      display: grid;
+      grid-template-columns: 76px 12px minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .schedule-time {
+      font-weight: 760;
+      font-size: 14px;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--green);
+      margin-top: 6px;
+    }
+
+    .dot.blue { background: var(--blue); }
+    .dot.purple { background: var(--purple); }
+
+    .schedule-row strong {
+      display: block;
+      font-size: 15px;
+      margin-bottom: 5px;
+    }
+
+    .schedule-row span,
+    .announcement-row p,
+    .announcement-row time {
+      color: var(--soft-text);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .add-event {
+      justify-self: center;
+      margin-top: 6px;
+      color: var(--blue);
+      font-weight: 780;
+      border: 0;
+      background: transparent;
+    }
+
+    .announcement-list {
+      display: grid;
+      gap: 20px;
+    }
+
+    .announcement-row {
+      display: grid;
+      grid-template-columns: 12px minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .announcement-row .dot {
+      margin-top: 4px;
+    }
+
+    .announcement-row strong {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 14px;
+    }
+
+    .announcement-row p {
+      margin: 0;
+    }
+
+    .focus-card {
+      position: relative;
+      overflow: hidden;
+      min-height: 160px;
+      padding: 24px;
+      border: 0;
+      background: linear-gradient(135deg, #f2e5ff, #eef0ff);
+    }
+
+    .focus-card:after {
+      content: "";
+      position: absolute;
+      right: -52px;
+      top: 14px;
+      width: 150px;
+      height: 190px;
+      border-radius: 50%;
+      background: rgba(122, 136, 255, .28);
+    }
+
+    .focus-card .focus-content {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .focus-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #e7d1ff;
+      color: #8a39ff;
+    }
+
+    .focus-card p {
+      margin: 7px 0 18px;
+      color: var(--soft-text);
+    }
+
+    .focus-button {
+      min-height: 46px;
+      border: 0;
+      border-radius: 14px;
+      padding: 0 20px;
+      background: rgba(255, 255, 255, .62);
+      color: #3d3852;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 760;
+      box-shadow: 0 8px 18px rgba(89, 73, 130, .08);
+    }
+
+    .page-title {
+      margin: 4px 0 8px;
+      font-size: clamp(30px, 3vw, 40px);
+      letter-spacing: -.05em;
+    }
+
+    .page-subtitle {
+      color: var(--soft-text);
+      margin: 0 0 24px;
+      font-size: 16px;
+      max-width: 860px;
+      line-height: 1.5;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .chip {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 999px;
+      padding: 0 15px;
+      color: var(--soft-text);
+      font-weight: 720;
+    }
+
+    .chip.active {
+      background: var(--blue);
+      color: #fff;
+      border-color: var(--blue);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+
+    table {
+      width: 100%;
+      min-width: 720px;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--soft-text);
+      font-size: 12px;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      background: #fafcff;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .tool-tile {
+      min-height: 92px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .88);
+      box-shadow: var(--shadow-soft);
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 16px;
+      padding: 18px;
+      text-align: left;
+    }
+
+    .tool-tile:hover {
+      border-color: rgba(20, 99, 255, .34);
+      box-shadow: 0 0 0 4px rgba(20, 99, 255, .08), var(--shadow-soft);
+    }
+
+    .tool-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: var(--blue-soft);
+      color: var(--blue);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+    }
+
+    .tool-tile strong {
+      display: block;
+      font-size: 16px;
+      margin-bottom: 5px;
+    }
+
+    .tool-tile span {
+      color: var(--soft-text);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .status-pill {
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: #f1f5fb;
+      color: var(--soft-text);
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .toast {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 40;
+      max-width: 380px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: #111318;
+      color: #fff;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .dark {
+      --page: #111722;
+      --panel: rgba(31, 39, 54, .88);
+      --panel-solid: #202938;
+      --text: #f7f9fd;
+      --soft-text: #c5ccda;
+      --muted: #9aa4b6;
+      --line: rgba(255, 255, 255, .10);
+      background: #111722;
+    }
+
+    .dark .sidebar,
+    .dark .panel,
+    .dark .priority-card,
+    .dark .course-card,
+    .dark .continue-card,
+    .dark .searchbar input,
+    .dark .shortcut,
+    .dark .tool-tile,
+    .dark .table-wrap {
+      background: var(--panel);
+      border-color: var(--line);
+    }
+
+    .dark th {
+      background: rgba(255, 255, 255, .04);
+    }
+
+    .dark .side-bottom,
+    .dark .plain-button {
+      background: rgba(31, 39, 54, .84);
+      border-color: var(--line);
+    }
+
+    .dark .nav-button:hover,
+    .dark .nav-button[aria-current="page"] {
+      background: rgba(20, 99, 255, .16);
+    }
+
+    .dark .caught-up,
+    .dark .course-info p,
+    .dark .announcement-row p,
+    .dark .schedule-row span {
+      color: var(--soft-text);
+    }
+
+    :focus-visible {
+      outline: 3px solid rgba(20, 99, 255, .52);
+      outline-offset: 3px;
+    }
+
+    @media (max-width: 1280px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .right-rail {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .focus-card {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 1080px) {
+      .app-frame {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+        height: auto;
+        grid-template-columns: 1fr;
+      }
+
+      .nav {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .side-bottom {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .cards-3,
+      .course-grid,
+      .right-rail {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 740px) {
+      .main-shell,
+      .sidebar {
+        padding: 20px;
+      }
+
+      .topbar,
+      .layout,
+      .cards-3,
+      .course-grid,
+      .right-rail,
+      .tool-grid,
+      .nav,
+      .side-bottom {
+        grid-template-columns: 1fr;
+      }
+
+      .top-actions {
+        justify-content: space-between;
+      }
+
+      .continue-card {
+        grid-template-columns: 1fr;
+      }
+
+      .profile {
+        justify-self: start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <div class="app-frame">
+    <aside class="sidebar" aria-label="Primary navigation">
+      <a class="logo" href="#home" data-route="home" aria-label="Brightspace home">
+        <span class="spark" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>
+        <span class="wordmark"><strong>brightspace</strong><span>by D2L</span></span>
+      </a>
+      <nav class="nav" id="nav"></nav>
+      <div class="side-bottom">
+        <div class="side-setting">
+          <span class="ui-icon" aria-hidden="true" data-icon="moon"></span>
+          <span>Dark Mode</span>
+          <button class="switch" type="button" id="darkToggle" aria-label="Toggle dark mode"><span></span></button>
+        </div>
+        <button class="side-setting" type="button" data-route="settings">
+          <span class="ui-icon" aria-hidden="true" data-icon="settings"></span>
+          <span>Settings</span>
+          <span></span>
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-shell" id="main" tabindex="-1">
+      <header class="topbar">
+        <div class="greeting">
+          <h1 id="pageGreeting">Good morning, Aanya</h1>
+          <p id="pageLead">Here's what's happening in your learning today.</p>
+        </div>
+        <div class="top-actions" aria-label="Global actions">
+          <button class="round-action" type="button" data-toast="Notifications opened">
+            <span class="ui-icon" aria-hidden="true" data-icon="bell"></span>
+            <span class="count">3</span>
+          </button>
+          <button class="round-action" type="button" data-route="messages" aria-label="Messages">
+            <span class="ui-icon" aria-hidden="true" data-icon="message"></span>
+          </button>
+          <button class="profile" type="button" data-route="settings">
+            <span class="avatar" aria-hidden="true"><span class="face"></span></span>
+            <span>Aanya</span>
+            <span class="ui-icon" aria-hidden="true" data-icon="chevron-down"></span>
+          </button>
+        </div>
+      </header>
+
+      <div class="layout">
+        <section class="content" id="content"></section>
+        <aside class="right-rail" id="rightRail" aria-label="Schedule, announcements, and focus mode"></aside>
+      </div>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const icons = {
+      home: '<svg viewBox="0 0 24 24"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg>',
+      book: '<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H21"/><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H21v20H6.5A2.5 2.5 0 0 1 4 19.5z"/></svg>',
+      folder: '<svg viewBox="0 0 24 24"><path d="M3 6h7l2 2h9v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+      assignment: '<svg viewBox="0 0 24 24"><path d="M9 5h6"/><path d="M9 12l2 2 4-4"/><path d="M6 3h12v18H6z"/></svg>',
+      chart: '<svg viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M4 19h17"/><path d="M8 17v-5"/><path d="M13 17V8"/><path d="M18 17v-8"/></svg>',
+      calendar: '<svg viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><path d="M3 10h18"/><rect x="3" y="4" width="18" height="18" rx="2"/></svg>',
+      mail: '<svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="m4 7 8 6 8-6"/></svg>',
+      users: '<svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+      grid: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
+      help: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.8 2.8 0 0 1 5.2 1.4c0 2.1-2.7 2.2-2.7 4"/><path d="M12 18h.01"/></svg>',
+      moon: '<svg viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.7 6.7 0 0 0 9.8 9.8z"/></svg>',
+      settings: '<svg viewBox="0 0 24 24"><path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5z"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.9 2.9l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.9-2.9l.1-.1A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.6-1H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.9-2.9l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.9 2.9l-.1.1a1.7 1.7 0 0 0-.3 1.8 1.7 1.7 0 0 0 1.6 1H21a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.4 1z"/></svg>',
+      bell: '<svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>',
+      message: '<svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>',
+      chevron: '<svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>',
+      chevronDown: '<svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>',
+      heart: '<svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.4 5.4 0 0 0-7.6 0L12 5.8l-1.2-1.2a5.4 5.4 0 1 0-7.6 7.6L12 21l8.8-8.8a5.4 5.4 0 0 0 0-7.6z"/></svg>',
+      search: '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
+      plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg>',
+      zap: '<svg viewBox="0 0 24 24"><path d="M13 2 3 14h8l-1 8 11-13h-8z"/></svg>',
+      play: '<svg viewBox="0 0 24 24"><path d="m8 5 11 7-11 7z"/></svg>'
+    };
+
+    const nav = [
+      ["home", "home", "Home", ""],
+      ["courses", "book", "My Courses", ""],
+      ["content", "folder", "Content", ""],
+      ["assignments", "assignment", "Assignments", "2"],
+      ["grades", "chart", "Grades", ""],
+      ["calendar", "calendar", "Calendar", ""],
+      ["messages", "mail", "Messages", "5"],
+      ["discussions", "users", "Discussions", "6"],
+      ["tools", "grid", "Tools", ""],
+      ["help", "help", "Help", ""]
+    ];
+
+    const routes = {
+      home: ["Good morning, Aanya", "Here's what's happening in your learning today."],
+      courses: ["My Courses", "Pinned, active, archived, and completed courses."],
+      content: ["Content", "Course modules, files, pages, URLs, activities, and resources."],
+      assignments: ["Assignments", "Submission folders, due dates, rubrics, annotations, feedback, and exemptions."],
+      grades: ["Grades", "Grade book feedback, rubrics, calculated grades, final grades, and evidence."],
+      calendar: ["Calendar", "Course events, due dates, office hours, quiz windows, and personal reminders."],
+      messages: ["Messages", "Course email, instant messages, classlist communication, and subscriptions."],
+      discussions: ["Discussions", "Forums, topics, unread posts, groups, subscriptions, and assessed discussions."],
+      tools: ["Tools", "All Brightspace tools and administration links."],
+      settings: ["Settings", "Profile, account preferences, notifications, accessibility, privacy, and logout."],
+      help: ["Help", "Support, documentation, system checks, accessibility help, and Pulse."]
+    };
+
+    const courses = [
+      ["Data Science 101", "Prof. Michael Chen", 65, "linear-gradient(135deg, #2348e8, #c356e7 50%, #ff8b77)"],
+      ["Marketing 201", "Prof. Sarah Johnson", 40, "linear-gradient(135deg, #8792a7, #ccd3df), repeating-linear-gradient(70deg, transparent 0 13px, rgba(255,255,255,.34) 14px 16px)"],
+      ["Statistics 201", "Prof. David Kim", 75, "radial-gradient(circle at 72% 32%, #396f70 0 18%, transparent 19%), radial-gradient(circle at 38% 55%, #83b8ad 0 20%, transparent 21%), linear-gradient(135deg, #d6ebe9, #7aa6a0)"],
+      ["Business Ethics", "Prof. Laura Bennett", 20, "linear-gradient(135deg, #e9ecff, #bfc9ea 48%, #ffffff)"]
+    ];
+
+    const priorities = [
+      ["Due Today", "1 assignment", "Research Report", "Data Science 101", "Due 11:59 PM", "date-red", "assignment", ""],
+      ["Due This Week", "2 assignments", "Case Study Analysis", "Marketing 201", "Fri, May 10", "date-orange", "folder", "orange"],
+      ["Upcoming", "3 events", "Midterm Exam", "Statistics 201", "May 15", "date-green", "book", "green"]
+    ];
+
+    const schedule = [
+      ["9:00 AM", "Statistics 201", "Lecture", ""],
+      ["11:00 AM", "Marketing 201", "Seminar", "blue"],
+      ["2:30 PM", "Data Science 101", "Lab Session", "purple"]
+    ];
+
+    const announcements = [
+      ["Course Update", "Data Science 101 syllabus has been updated.", "2h ago", "blue"],
+      ["Reminder", "Marketing 201 assignment due this Friday.", "1d ago", "purple"],
+      ["New Content", "New module added in Business Ethics.", "2d ago", ""]
+    ];
+
+    const rows = {
+      content: [
+        ["Week 6: Cognitive Load", "Page, slides, reading, assignment link", "78% complete", "Open"],
+        ["Week 7: Accessibility", "Page, quiz, checklist, rubric", "35% complete", "Open"],
+        ["Resources", "Syllabus, schedule, library reserves, recordings", "Pinned", "Open"]
+      ],
+      assignments: [
+        ["Research Report", "Data Science 101", "Due today 11:59 PM", "Not submitted"],
+        ["Case Study Analysis", "Marketing 201", "Fri, May 10", "Draft saved"],
+        ["Prototype Critique", "HCI 301", "Friday", "Rubric attached"],
+        ["Source Checklist", "Business Ethics", "Tuesday", "3 of 5 complete"]
+      ],
+      grades: [
+        ["Data Science Lab", "Data Science 101", "65 / 100", "Feedback returned"],
+        ["Marketing Case Memo", "Marketing 201", "18 / 20", "Rubric available"],
+        ["Statistics Quiz 2", "Statistics 201", "92%", "Auto-graded"],
+        ["Business Ethics Reflection", "Business Ethics", "A-", "Instructor comments"]
+      ],
+      calendar: [
+        ["Today", "Statistics 201 lecture", "9:00 AM", "Room 214"],
+        ["Today", "Marketing 201 seminar", "11:00 AM", "Online"],
+        ["Today", "Data Science 101 lab", "2:30 PM", "Lab session"],
+        ["May 15", "Statistics midterm exam", "9:00 AM", "Available in Quizzes"]
+      ],
+      messages: [
+        ["Prof. Michael Chen", "Data Science 101", "Syllabus update", "Unread"],
+        ["Prof. Sarah Johnson", "Marketing 201", "Assignment reminder", "Unread"],
+        ["Brightspace Notifications", "All courses", "3 due-date alerts", "Unread"],
+        ["Study Group", "Statistics 201", "Midterm review notes", "Read"]
+      ],
+      discussions: [
+        ["Data ethics forum", "Business Ethics", "3 unread", "Reply required"],
+        ["Case study review", "Marketing 201", "6 unread", "Assessed"],
+        ["Statistics help thread", "Statistics 201", "0 unread", "Subscribed"]
+      ]
+    };
+
+    const toolGroups = [
+      ["Content", "Modules, topics, files, pages, URLs, media, checklists, rubrics, and LTI links", "content"],
+      ["Assignments", "Submission folders, annotations, Turnitin, rubrics, special access, grades, and feedback", "assignments"],
+      ["Quizzes", "Attempts, timers, question library, accommodations, special access, and feedback", "tools"],
+      ["Discussions", "Forums, topics, groups, subscriptions, assessments, and attachments", "discussions"],
+      ["Grades", "Grade book, grade items, exemptions, rubrics, calculated and adjusted final grades", "grades"],
+      ["Calendar", "Course events, office hours, availability windows, and personal reminders", "calendar"],
+      ["Classlist", "People, roles, sections, group enrollments, email, profile, and progress links", "tools"],
+      ["Class Progress", "Summary, grades, standards, objectives, content, discussions, assignments, quizzes, checklists, surveys, login history, and system access", "tools"],
+      ["Groups", "Group enrollments, workspaces, lockers, discussions, and assignment folders", "tools"],
+      ["Attendance", "Session attendance, status schemes, and attendance reports", "tools"],
+      ["Surveys", "Anonymous or named course surveys and reports", "tools"],
+      ["Self Assessments", "Formative checks and learner reflection", "tools"],
+      ["Rubrics", "Criteria, levels, scoring, outcomes, and assessment feedback", "tools"],
+      ["Awards", "Badges, certificates, release conditions, and recognition", "tools"],
+      ["Learning Outcomes", "Standards, outcomes, alignments, mastery, and evidence", "tools"],
+      ["Competencies", "Competency structures, activities, and achievement tracking", "tools"],
+      ["Announcements", "News, activity feed posts, scheduling, attachments, and read status", "home"],
+      ["Email", "Course email, classlist mail, signatures, and sent mail", "messages"],
+      ["Instant Messages", "Direct messages and online presence", "messages"],
+      ["Subscriptions", "Discussion, announcement, and activity notifications", "messages"],
+      ["Course Admin", "All administration tools, course offering details, files, dates, copy, sections, and permissions", "tools"],
+      ["Course Builder", "Visual course structure and activity creation", "tools"],
+      ["Manage Files", "Course file upload, replace, move, and organize", "tools"],
+      ["Manage Dates", "Bulk start, due, and end date management", "tools"],
+      ["Import/Export/Copy Components", "Copy course content, import packages, and export components", "tools"],
+      ["Question Library", "Question pools and reusable quiz questions", "tools"],
+      ["Quick Eval", "Ungraded assignment, quiz, and discussion submissions", "tools"],
+      ["Intelligent Agents", "Automated alerts and learner nudges", "tools"],
+      ["Release Conditions", "Conditional access rules for content and assessments", "tools"],
+      ["External Learning Tools", "LTI, publisher, virtual classroom, and third-party apps", "tools"],
+      ["Media Library", "Audio, video, Video Note, and course media", "tools"],
+      ["Portfolio and ePortfolio", "Artifacts, evidence, presentations, and collections", "tools"],
+      ["Locker", "Personal file storage and sharing", "tools"],
+      ["Account Settings", "Profile, locale, font, discussions, email, privacy, notifications, and logout", "settings"],
+      ["Brightspace Pulse", "Mobile calendar, grades, and notifications", "help"]
+    ];
+
+    let state = {
+      route: "home",
+      dark: localStorage.getItem("brightspace-dark") === "true"
+    };
+
+    function icon(name) {
+      return icons[name] || icons.grid;
+    }
+
+    function renderIcons() {
+      document.querySelectorAll("[data-icon]").forEach(node => {
+        const name = node.dataset.icon.replace("-down", "Down");
+        node.innerHTML = icon(name);
+      });
+    }
+
+    function routeTo(route) {
+      state.route = route;
+      render();
+      requestAnimationFrame(() => document.getElementById("main").focus());
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove("show"), 2400);
+    }
+
+    function renderNav() {
+      document.getElementById("nav").innerHTML = nav.map(([route, ic, label, count]) => `
+        <button class="nav-button" type="button" data-route="${route}" ${state.route === route ? 'aria-current="page"' : ""}>
+          <span class="nav-icon">${icon(ic)}</span>
+          <span>${label}</span>
+          ${count ? `<span class="mini-badge">${count}</span>` : ""}
+        </button>
+      `).join("");
+    }
+
+    function renderRightRail() {
+      document.getElementById("rightRail").innerHTML = `
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Today's Schedule</h2>
+            <button class="link-button" type="button" data-route="calendar">View calendar</button>
+          </div>
+          <div class="schedule">
+            ${schedule.map(([time, title, type, color]) => `
+              <div class="schedule-row">
+                <span class="schedule-time">${time}</span>
+                <span class="dot ${color}"></span>
+                <span><strong>${title}</strong><span>${type}</span></span>
+              </div>
+            `).join("")}
+            <button class="add-event" type="button" data-toast="New event dialog opened">+ Add event</button>
+          </div>
+        </section>
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Announcements</h2>
+            <button class="link-button" type="button" data-route="home">View all</button>
+          </div>
+          <div class="announcement-list">
+            ${announcements.map(([title, body, time, color]) => `
+              <article class="announcement-row">
+                <span class="dot ${color}"></span>
+                <div><strong>${title}</strong><p>${body}</p></div>
+                <time>${time}</time>
+              </article>
+            `).join("")}
+          </div>
+        </section>
+        <section class="panel focus-card">
+          <div class="focus-content">
+            <span class="focus-icon">${icon("settings")}</span>
+            <div>
+              <h2>Focus Mode</h2>
+              <p>Minimize distractions</p>
+              <button class="focus-button" type="button" data-toast="Focus mode started">${icon("zap")} Start Focus ${icon("chevron")}</button>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderSearch() {
+      return `
+        <label class="searchbar">
+          <span class="left">${icon("search")}</span>
+          <input id="searchInput" type="search" placeholder="Search for courses, content, people and more...">
+          <span class="shortcut"># K</span>
+        </label>
+      `;
+    }
+
+    function renderHome() {
+      document.getElementById("content").innerHTML = `
+        ${renderSearch()}
+        <section>
+          <div class="section-head">
+            <div class="section-title">
+              <h2>My Priorities</h2>
+              <span class="ui-icon" style="color:var(--blue)">${icon("zap")}</span>
+              <span>Focus on what matters most</span>
+            </div>
+            <button class="link-button" type="button" data-route="assignments">View all ${icon("chevron")}</button>
+          </div>
+          <div class="cards-3">
+            ${priorities.map(([label, count, title, course, due, dateClass, ic, tone]) => `
+              <article class="priority-card">
+                <div class="priority-top">
+                  <span class="bubble ${tone}">${icon(ic)}</span>
+                  <span><h3>${label}</h3><p>${count}</p></span>
+                </div>
+                <div class="priority-main"><strong>${title}</strong><span>${course}</span></div>
+                <div class="priority-foot"><span class="${dateClass}">${due}</span><button class="round-action" type="button" data-route="assignments">${icon("chevron")}</button></div>
+              </article>
+            `).join("")}
+          </div>
+        </section>
+
+        <section>
+          <div class="section-head">
+            <div class="section-title"><h2>My Courses</h2></div>
+            <div>
+              <button class="link-button" type="button" data-route="courses">See all</button>
+              <button class="plain-button" type="button" data-toast="Previous courses">${icon("chevron")}</button>
+              <button class="plain-button" type="button" data-toast="Next courses">${icon("chevron")}</button>
+            </div>
+          </div>
+          <div class="course-grid">
+            ${courses.map(([title, prof, progress, art]) => `
+              <article class="course-card">
+                <div class="course-art" style="--art:${art}"><span class="heart">${icon("heart")}</span></div>
+                <div class="course-info">
+                  <h3>${title}</h3>
+                  <p>${prof}</p>
+                  <div class="progress-row">
+                    <span class="bar"><span style="--value:${progress}%"></span></span>
+                    <span>${progress}%</span>
+                    <span class="bookmark" aria-hidden="true"></span>
+                  </div>
+                </div>
+              </article>
+            `).join("")}
+          </div>
+        </section>
+
+        <section>
+          <div class="section-head">
+            <div class="section-title"><h2>Continue Learning</h2></div>
+          </div>
+          <article class="continue-card">
+            <div class="thumb"><span class="play">${icon("play")}</span></div>
+            <div class="continue-copy">
+              <p>Data Science 101</p>
+              <h3>Introduction to Machine Learning</h3>
+              <div class="continue-progress"><span class="bar"><span style="--value:35%"></span></span><span>35% complete</span></div>
+            </div>
+            <button class="primary" type="button" data-route="content">Continue</button>
+            <button class="kebab" type="button" data-toast="More learning options">...</button>
+          </article>
+          <p class="caught-up">You're all caught up! Keep up the great work.</p>
+        </section>
+      `;
+      wireSearch();
+    }
+
+    function renderCoursesPage() {
+      document.getElementById("content").innerHTML = `
+        ${renderSearch()}
+        <h2 class="page-title">My Courses</h2>
+        <p class="page-subtitle">All active and pinned courses use the same structure, so course cards, progress, grades, unread updates, and next actions are predictable.</p>
+        <div class="course-grid">${courses.map(([title, prof, progress, art]) => `
+          <article class="course-card">
+            <div class="course-art" style="--art:${art}"><span class="heart">${icon("heart")}</span></div>
+            <div class="course-info">
+              <h3>${title}</h3>
+              <p>${prof}</p>
+              <div class="progress-row"><span class="bar"><span style="--value:${progress}%"></span></span><span>${progress}%</span><span class="bookmark"></span></div>
+            </div>
+          </article>`).join("")}</div>
+      `;
+      wireSearch();
+    }
+
+    function tablePage(route, title, subtitle, headers, data) {
+      document.getElementById("content").innerHTML = `
+        ${renderSearch()}
+        <h2 class="page-title">${title}</h2>
+        <p class="page-subtitle">${subtitle}</p>
+        <div class="toolbar">
+          <button class="chip active" type="button">All</button>
+          <button class="chip" type="button">Open</button>
+          <button class="chip" type="button">Unread</button>
+          <button class="chip" type="button">Needs action</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr></thead>
+            <tbody>${data.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join("")}</tr>`).join("")}</tbody>
+          </table>
+        </div>
+      `;
+      wireSearch();
+    }
+
+    function renderToolsPage() {
+      document.getElementById("content").innerHTML = `
+        ${renderSearch()}
+        <h2 class="page-title">Tools</h2>
+        <p class="page-subtitle">All Brightspace features remain available: learner tools, course tools, communication, progress, assessment, resources, integrations, and administration.</p>
+        <div class="tool-grid">
+          ${toolGroups.map(([title, desc, route]) => `
+            <button class="tool-tile" type="button" data-route="${route}">
+              <span class="tool-icon">${title.slice(0, 2)}</span>
+              <span><strong>${title}</strong><span>${desc}</span></span>
+              <span class="status-pill">Open</span>
+            </button>
+          `).join("")}
+        </div>
+      `;
+      wireSearch();
+    }
+
+    function renderHelpPage() {
+      document.getElementById("content").innerHTML = `
+        ${renderSearch()}
+        <h2 class="page-title">Help</h2>
+        <p class="page-subtitle">Documentation, accessibility support, system checks, Pulse, help desk, training videos, and error recovery are available from one place.</p>
+        <div class="tool-grid">
+          ${[
+            ["Brightspace Help", "Official documentation and guided help"],
+            ["System Check", "Browser, cookies, popups, media, and network checks"],
+            ["Accessibility Help", "Keyboard, screen reader, contrast, captions, and readable layout support"],
+            ["Brightspace Pulse", "Mobile calendar, grades, due dates, and push notifications"],
+            ["Help Desk", "Institution support and ticket history"],
+            ["Error Recovery", "Upload retry, autosave status, missing access explanations, and next steps"]
+          ].map(([title, desc]) => `
+            <button class="tool-tile" type="button" data-toast="${title} opened">
+              <span class="tool-icon">${title.slice(0, 2)}</span>
+              <span><strong>${title}</strong><span>${desc}</span></span>
+              <span class="status-pill">Open</span>
+            </button>
+          `).join("")}
+        </div>
+      `;
+      wireSearch();
+    }
+
+    function renderSettingsPage() {
+      document.getElementById("content").innerHTML = `
+        ${renderSearch()}
+        <h2 class="page-title">Settings</h2>
+        <p class="page-subtitle">Profile, account settings, notification rules, display preferences, accessibility options, language, discussions, email, privacy, and logout controls.</p>
+        <div class="tool-grid">
+          ${[
+            ["Profile", "Name, image, contact details, and pronouns"],
+            ["Account Settings", "Font, locale, time zone, email, and discussion defaults"],
+            ["Notifications", "Email, SMS, Pulse push, instant alerts, and subscriptions"],
+            ["Accessibility", "High contrast, reduced motion, captions, readable spacing, and keyboard navigation"],
+            ["Privacy", "Directory visibility and profile sharing"],
+            ["Logout", "End current session"]
+          ].map(([title, desc]) => `
+            <button class="tool-tile" type="button" data-toast="${title} opened">
+              <span class="tool-icon">${title.slice(0, 2)}</span>
+              <span><strong>${title}</strong><span>${desc}</span></span>
+              <span class="status-pill">Open</span>
+            </button>
+          `).join("")}
+        </div>
+      `;
+      wireSearch();
+    }
+
+    function renderRoute() {
+      const [title, lead] = routes[state.route] || routes.home;
+      document.getElementById("pageGreeting").textContent = title;
+      document.getElementById("pageLead").textContent = lead;
+      if (state.route === "home") renderHome();
+      else if (state.route === "courses") renderCoursesPage();
+      else if (state.route === "tools") renderToolsPage();
+      else if (state.route === "help") renderHelpPage();
+      else if (state.route === "settings") renderSettingsPage();
+      else if (state.route === "content") tablePage("content", "Content", routes.content[1], ["Module", "Includes", "Status", "Action"], rows.content);
+      else if (state.route === "assignments") tablePage("assignments", "Assignments", routes.assignments[1], ["Activity", "Course", "Due", "Status"], rows.assignments);
+      else if (state.route === "grades") tablePage("grades", "Grades", routes.grades[1], ["Item", "Course", "Score", "Feedback"], rows.grades);
+      else if (state.route === "calendar") tablePage("calendar", "Calendar", routes.calendar[1], ["Date", "Event", "Time", "Location"], rows.calendar);
+      else if (state.route === "messages") tablePage("messages", "Messages", routes.messages[1], ["From", "Course", "Subject", "Status"], rows.messages);
+      else if (state.route === "discussions") tablePage("discussions", "Discussions", routes.discussions[1], ["Forum", "Course", "Unread", "Status"], rows.discussions);
+      else renderHome();
+    }
+
+    function wireSearch() {
+      const input = document.getElementById("searchInput");
+      if (!input) return;
+      input.addEventListener("input", event => {
+        const value = event.target.value.trim().toLowerCase();
+        if (!value) {
+          renderRoute();
+          return;
+        }
+        const matches = [
+          ...courses.map(c => [c[0], c[1], "courses"]),
+          ...Object.values(rows).flatMap(list => list.map(row => [row[0], row.slice(1).join(" "), state.route])),
+          ...toolGroups.map(tool => [tool[0], tool[1], tool[2]])
+        ].filter(item => `${item[0]} ${item[1]}`.toLowerCase().includes(value)).slice(0, 18);
+        document.getElementById("content").innerHTML = `
+          ${renderSearch()}
+          <h2 class="page-title">Search Results</h2>
+          <p class="page-subtitle">${matches.length} results for "${value}".</p>
+          <div class="tool-grid">${matches.map(([label, desc, route]) => `
+            <button class="tool-tile" type="button" data-route="${route}">
+              <span class="tool-icon">${label.slice(0, 2)}</span>
+              <span><strong>${label}</strong><span>${desc}</span></span>
+              <span class="status-pill">Open</span>
+            </button>
+          `).join("") || '<div class="panel">No matching courses, content, people, or tools.</div>'}</div>
+        `;
+        const newInput = document.getElementById("searchInput");
+        newInput.value = value;
+        newInput.focus();
+        newInput.setSelectionRange(value.length, value.length);
+        wireSearch();
+      });
+    }
+
+    function render() {
+      document.body.classList.toggle("dark", state.dark);
+      renderNav();
+      renderRightRail();
+      renderRoute();
+      renderIcons();
+      localStorage.setItem("brightspace-dark", String(state.dark));
+    }
+
+    document.addEventListener("click", event => {
+      const routeTarget = event.target.closest("[data-route]");
+      if (routeTarget) {
+        event.preventDefault();
+        routeTo(routeTarget.dataset.route);
+        return;
+      }
+      const toastTarget = event.target.closest("[data-toast]");
+      if (toastTarget) {
+        showToast(toastTarget.dataset.toast);
+      }
+    });
+
+    document.getElementById("darkToggle").addEventListener("click", () => {
+      state.dark = !state.dark;
+      render();
+    });
+
+    document.addEventListener("keydown", event => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        const input = document.getElementById("searchInput");
+        if (input) input.focus();
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>
